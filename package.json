@@ -16,13 +16,13 @@
   },
   "homepage": "https://github.com/debitoor/express-timeout-handler}",
   "devDependencies": {
-    "chai": "^2.2.0",
-    "mocha": "^2.1.1",
-    "mocha-eslint": "^0.1.7",
-    "mocha-jscs": "^3.0.0",
+    "chai": "2.2.0",
+    "mocha": "2.1.1",
+    "mocha-eslint": "0.1.7",
+    "mocha-jscs": "3.0.0",
     "jscs": "2.2.1"
   },
   "dependencies": {
-    "groom": "^1.1.1"
+    "groom": "1.1.1"
   }
 }
