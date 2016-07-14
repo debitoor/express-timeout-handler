@@ -1,0 +1,28 @@
+{
+  "name": "express-timeout-handler",
+  "version": "1.0.0",
+  "description": "{{description}}",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/debitoor/express-timeout-handler"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/debitoor/express-timeout-handler/issues"
+  },
+  "homepage": "https://github.com/debitoor/express-timeout-handler}",
+  "devDependencies": {
+    "chai": "^2.2.0",
+    "mocha": "^2.1.1",
+    "mocha-eslint": "^0.1.7",
+    "mocha-jscs": "^3.0.0",
+    "jscs": "2.2.1"
+  },
+  "dependencies": {
+    "groom": "^1.1.1"
+  }
+}
