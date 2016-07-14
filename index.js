@@ -42,8 +42,8 @@ function set(timeout) {
 function handler(opts) {
 	opts = opts || {};
 	validateTimeout(opts.timeout);
-	if (opts.onResponse && typeof opts.onResponse !== 'function') {
-		throw new Error('onResponse option must be a function');
+	if (opts.onDelayedResponse && typeof opts.onDelayedResponse !== 'function') {
+		throw new Error('onDelayedResponse option must be a function');
 	}
 	if (opts.disable && !Array.isArray(opts.disable)) {
 		throw new Error('disable option must be an array');
@@ -64,7 +64,9 @@ function handler(opts) {
 			next(timeoutError);
 		});
 
-		res.on('finish', timeoutSocket && disableResponse(res));
+		res.on('finish', () => {
+			timeoutSocket && disableResponse(res);
+		});
 
 		next();
 	};

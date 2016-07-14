@@ -30,11 +30,11 @@ var options = {
 	// Optional. Define a function to be called if an attempt to send a response
 	// happens after the timeout where:
 	// - method: is the method that was called on the response object
-	// - arguments: are the arguments passed to the method
+	// - args: are the arguments passed to the method
 	// - requestTime: is the duration of the request
 	// - err: is the same err as was passed to the next-function when the timeout
 	// happened
-	onDelayedResponse: function(method, arguments, requestTime, err) {
+	onDelayedResponse: function(method, args, requestTime, err) {
 		console.log(`Attempted to call ${method} after timeout`);
 	},
 
