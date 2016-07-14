@@ -45,6 +45,9 @@ function handler(opts) {
 	if (opts.onResponse && typeof opts.onResponse !== 'function') {
 		throw new Error('onResponse option must be a function');
 	}
+	if (opts.disable && !Array.isArray(opts.disable)) {
+		throw new Error('disable option must be an array');
+	}
 	var disableList = opts.disable || DEFAULT_DISABLE_LIST;
 	var start, timeoutSocket, timeoutError;
 
