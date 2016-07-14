@@ -61,7 +61,7 @@ app.get('/leave',
 	}
 );
 
-app.use(function(err, res, req, next) {
+app.use(function(err, req, res, next) {
 	var statusCode = err.statusCode || 500;
 	var msg = err.msg || 'Error happened on server';
 	res.status(statusCode).send(msg);
