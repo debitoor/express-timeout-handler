@@ -1,6 +1,6 @@
 # express-timeout-handler
 
-Timeout handler that works with any custom error handler in express.
+Express timeout middleware that works in combination with any error middleware in express.
 
 Add a global timeouts to all your routes in express and add individual timeouts to specific routes. If a timeout happens an error will be passed to ``next`` callback in express, so that an error handler can act on the timeout. When the response ends, this modules disables all methods on the response object which might try and send something after the timeout happened.
 
@@ -22,7 +22,10 @@ var options = {
 	// Optional. This will be the error passed to the next-function if a timeout
 	// happens. It can be an object or a function that returns the error to be
 	// used. If omitted a default error is used.
-	error: new Error('oh no, timeout happened'),
+	error: {
+		msg: 'Service unavailable. Please try again.',
+		statusCode: 503
+	},
 
 	// Optional. Define a function to be called if an attempt to send a response
 	// happens after the timeout where:
@@ -32,7 +35,7 @@ var options = {
 	// - err: is the same err as was passed to the next-function when the timeout
 	// happened
 	onDelayedResponse: function(method, arguments, requestTime, err) {
-		console.log('Attempt to send response after timeout');
+		console.log(`Attempted to call ${method} after timeout`);
 	},
 
 	// Optional. Provide a list of which methods should be disabled on the
@@ -53,9 +56,9 @@ app.get('/greeting',
 );
 
 app.use(function(err, res, req, next) {
-	if (!res.headersSent) {
-		res.send('Error happened on server');
-	}
+	var statusCode = err.statusCode || 500;
+	var msg = err.msg || 'Error happened on server';
+	res.status(statusCode).send(msg);
 });
 
 app.listen(3000, function () {
