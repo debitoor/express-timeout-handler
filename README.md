@@ -47,11 +47,17 @@ var options = {
 
 app.use(timeout.handler(options));
 
-app.get('/greeting',
+app.get('/greet', //The default timeout is in effect here
+	function (req, res) {
+		res.send('Hello world!');
+	}
+);
+
+app.get('/leave',
 	// This is a specific endpoint timeout which overrides the default timeout
 	timeout.set(4000),
 	function (req, res) {
-		res.send('Hello world!');
+		res.send('Goodbye!');
 	}
 );
 
