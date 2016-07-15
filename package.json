@@ -1,6 +1,6 @@
 {
   "name": "express-timeout-handler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Express timeout middleware that works in combination with any error middleware in express.",
   "main": "index.js",
   "scripts": {
