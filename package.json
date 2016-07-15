@@ -21,7 +21,7 @@
     "coveralls": "2.11.11",
     "express": "4.14.0",
     "istanbul": "0.4.4",
-    "jscs": "2.2.1",
+    "jscs": "3.0.3",
     "mocha": "2.5.3",
     "mocha-eslint": "2.1.1",
     "mocha-jscs": "5.0.1",
