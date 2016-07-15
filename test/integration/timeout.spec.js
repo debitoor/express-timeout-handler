@@ -1,7 +1,7 @@
 var request = require('request');
 var testServer = require('../testServer');
 
-describe.only('timeout.spec.js', () => {
+describe('timeout.spec.js', () => {
 
 	describe('options validations', () => {
 
@@ -138,10 +138,7 @@ describe.only('timeout.spec.js', () => {
 		});
 
 		after( done => {
-			server.close( () => {
-				server = null;
-				done();
-			});
+			server.close(done);
 		});
 
 		it('should timeout after default timeout time has passed', () => {
@@ -200,10 +197,7 @@ describe.only('timeout.spec.js', () => {
 		});
 
 		after( done => {
-			server.close( () => {
-				server = null;
-				done();
-			});
+			server.close(done);
 		});
 
 		it('should timeout after specific endpoint timeout time has passed', () => {
@@ -232,11 +226,9 @@ describe.only('timeout.spec.js', () => {
 		});
 
 		after( done => {
-			server.close( () => {
-				server = null;
-				done();
-			});
+			server.close(done);
 		});
+
 		it('should timeout after specific endpoint timeout time has passed', () => {
 			expect(responseBody.requestTime).to.be.at.least(500);
 		});
