@@ -17,60 +17,60 @@ var app = express();
 
 var options = {
 
-	// Optional. This will be the default timeout for all endpoints.
-	// If omitted there is no default timeout on endpoints
-	timeout: 3000,
+  // Optional. This will be the default timeout for all endpoints.
+  // If omitted there is no default timeout on endpoints
+  timeout: 3000,
 
-	// Optional. This will be the error passed to the next-function if a timeout
-	// happens. It can be an object or a function that returns the error to be
-	// used. If omitted a default error is used.
-	error: {
-		msg: 'Service unavailable. Please try again.',
-		statusCode: 503
-	},
+  // Optional. This will be the error passed to the next-function if a timeout
+  // happens. It can be an object or a function that returns the error to be
+  // used. If omitted a default error is used.
+  error: {
+    msg: 'Service unavailable. Please try again.',
+    statusCode: 503
+  },
 
-	// Optional. Define a function to be called if an attempt to send a response
-	// happens after the timeout where:
-	// - method: is the method that was called on the response object
-	// - args: are the arguments passed to the method
-	// - requestTime: is the duration of the request
-	// - err: is the same err that was passed to the next-function when the
-	// timeout happened
-	onDelayedResponse: function(method, args, requestTime, err) {
-		console.log(`Attempted to call ${method} after timeout`);
-	},
+  // Optional. Define a function to be called if an attempt to send a response
+  // happens after the timeout where:
+  // - method: is the method that was called on the response object
+  // - args: are the arguments passed to the method
+  // - requestTime: is the duration of the request
+  // - err: is the same err that was passed to the next-function when the
+  // timeout happened
+  onDelayedResponse: function(method, args, requestTime, err) {
+    console.log(`Attempted to call ${method} after timeout`);
+  },
 
-	// Optional. Provide a list of which methods should be disabled on the
-	// response object when a timeout happens and an error has been sent. If
-	// omitted, a default list of all methods that tries to send a response
-	// will be disable on the response object
-	disable: ['writeHead', 'send', 'json', 'end'];
+  // Optional. Provide a list of which methods should be disabled on the
+  // response object when a timeout happens and an error has been sent. If
+  // omitted, a default list of all methods that tries to send a response
+  // will be disable on the response object
+  disable: ['writeHead', 'send', 'json', 'end'];
 };
 
 app.use(timeout.handler(options));
 
 app.get('/greet', //The default timeout is in effect here
-	function (req, res) {
-		res.send('Hello world!');
-	}
+  function (req, res) {
+    res.send('Hello world!');
+  }
 );
 
 app.get('/leave',
-	// This is a specific endpoint timeout which overrides the default timeout
-	timeout.set(4000),
-	function (req, res) {
-		res.send('Goodbye!');
-	}
+  // This is a specific endpoint timeout which overrides the default timeout
+  timeout.set(4000),
+  function (req, res) {
+    res.send('Goodbye!');
+  }
 );
 
 app.use(function(err, req, res, next) {
-	var statusCode = err.statusCode || 500;
-	var msg = err.msg || 'Error happened on server';
-	res.status(statusCode).send(msg);
+  var statusCode = err.statusCode || 500;
+  var msg = err.msg || 'Error happened on server';
+  res.status(statusCode).send(msg);
 });
 
 app.listen(3000, function () {
-	console.log('Server listening on port 3000');
+  console.log('Server listening on port 3000');
 });
 ```
 
