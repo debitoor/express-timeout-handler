@@ -179,8 +179,10 @@ describe('timeout.spec.js', () => {
 		before( done => {
 			var options = {
 				timeout: 250,
-				error: {
-					statusCode: 503
+				error: () => {
+					return {
+						statusCode: 503
+					};
 				}
 			};
 
@@ -236,7 +238,6 @@ describe('timeout.spec.js', () => {
 		it('should respond with expected error', () => {
 			expect(responseBody.msg).to.equal('Error: Timeout happened');
 		});
-
 	});
 
 });

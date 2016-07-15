@@ -4,7 +4,8 @@
   "description": "Express timeout middleware that works in combination with any error middleware in express.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "istanbul cover _mocha",
+    "coveralls": "cat ./coverage/lcov.info | coveralls"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,9 @@
   "homepage": "https://github.com/debitoor/express-timeout-handler",
   "devDependencies": {
     "chai": "3.5.0",
+    "coveralls": "2.11.11",
     "express": "4.14.0",
+    "istanbul": "0.4.4",
     "jscs": "2.2.1",
     "mocha": "2.5.3",
     "mocha-eslint": "2.1.1",

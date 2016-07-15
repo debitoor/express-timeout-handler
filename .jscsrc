@@ -1,6 +1,7 @@
 {
 	"disallowEmptyBlocks": true,
 	"validateIndentation": "\t",
-	"extract": false,
-	"excludeFiles": ["node_modules"]
+	"excludeFiles": [
+    "node_modules", "coverage"
+  ]
 }

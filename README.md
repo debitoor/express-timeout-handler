@@ -1,5 +1,7 @@
 # express-timeout-handler
 
+[![npm version](https://badge.fury.io/js/express-timeout-handler.svg)](https://badge.fury.io/js/express-timeout-handler) [![Build Status](https://travis-ci.org/debitoor/express-timeout-handler.svg?branch=master)](https://travis-ci.org/debitoor/express-timeout-handler) [![Dependency Status](https://david-dm.org/debitoor/express-timeout-handler.svg)](https://david-dm.org/debitoor/express-timeout-handler) [![devDependency Status](https://david-dm.org/debitoor/express-timeout-handler/dev-status.svg)](https://david-dm.org/debitoor/express-timeout-handler#info=devDependencies) [![Coverage Status](https://coveralls.io/repos/github/debitoor/express-timeout-handler/badge.svg?branch=master)](https://coveralls.io/github/debitoor/express-timeout-handler?branch=master)
+
 Express timeout middleware that works in combination with any error middleware in express.
 
 Add a global timeouts to all your routes in express and add individual timeouts to specific routes. If a timeout happens an error will be passed to the ``next`` callback in express, so that an error handler can act on the timeout. After the error handler sends a response to the caller, this module will set a ``globalTimeout`` property on the response object to true and disable all methods on the response object which might try and send something after the timeout happened.
