@@ -1,5 +1,3 @@
-var groom = require('groom');
-
 const DEFAULT_DISABLE_LIST = [
 	'writeHead',
 	'setHeaders',
@@ -40,8 +38,11 @@ function set(timeout) {
 }
 
 function handler(opts) {
+	if (opts && typeof opts.timeout !== 'undefined') {
+		validateTimeout(opts.timeout);
+	}
 	opts = opts || {};
-	validateTimeout(opts.timeout);
+
 	if (opts.onDelayedResponse && typeof opts.onDelayedResponse !== 'function') {
 		throw new Error('onDelayedResponse option must be a function');
 	}
@@ -59,6 +60,7 @@ function handler(opts) {
 		opts.timeout && req.connection.setTimeout(opts.timeout);
 
 		res.on('timeout', socket => {
+			res.globalTimeout = true;
 			timeoutError = getError(opts.error);
 			timeoutSocket = socket;
 			next(timeoutError);
@@ -85,7 +87,7 @@ function handler(opts) {
 			var method = `res.${arguments[0]}`;
 			delete arguments[0];
 			var args = Object.keys(arguments).reduce((memo, key, index) => {
-				memo[index] = groom(arguments[key]);
+				memo[index] = arguments[key];
 				return memo;
 			}, {});
 			opts.onDelayedResponse(method, args, requestTime, timeoutError);

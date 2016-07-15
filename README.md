@@ -2,7 +2,7 @@
 
 Express timeout middleware that works in combination with any error middleware in express.
 
-Add a global timeouts to all your routes in express and add individual timeouts to specific routes. If a timeout happens an error will be passed to ``next`` callback in express, so that an error handler can act on the timeout. When the response ends, this modules disables all methods on the response object which might try and send something after the timeout happened.
+Add a global timeouts to all your routes in express and add individual timeouts to specific routes. If a timeout happens an error will be passed to the ``next`` callback in express, so that an error handler can act on the timeout. After the error handler sends a response to the caller, this module will set a ``globalTimeout`` property on the response object to true and disable all methods on the response object which might try and send something after the timeout happened.
 
 	npm install --save express-timeout-handler
 
@@ -32,8 +32,8 @@ var options = {
 	// - method: is the method that was called on the response object
 	// - args: are the arguments passed to the method
 	// - requestTime: is the duration of the request
-	// - err: is the same err as was passed to the next-function when the timeout
-	// happened
+	// - err: is the same err that was passed to the next-function when the
+	// timeout happened
 	onDelayedResponse: function(method, args, requestTime, err) {
 		console.log(`Attempted to call ${method} after timeout`);
 	},

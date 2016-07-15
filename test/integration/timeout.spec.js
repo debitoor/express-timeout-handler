@@ -104,8 +104,8 @@ describe.only('timeout.spec.js', () => {
 		});
 	});
 
-	describe('when calling endoints without timeout', () => {
-		var statusCode, delayArguments;
+	describe('when calling endoint without timeout', () => {
+		var server, statusCode, responseBody, delayArguments;
 
 		before( done => {
 			var options = {
@@ -125,19 +125,30 @@ describe.only('timeout.spec.js', () => {
 			};
 
 			var lag = 750;
-			var specificTimeout = 500;
-			testServer(options, lag, specificTimeout, url => {
+			server = testServer(options, lag, url => {
 				var endpoint = `${url}/test`;
-				request.get(endpoint, (err, resp, body) => {
+				request.get(endpoint, { json: true }, (err, resp, body) => {
 					if (err) {
 						done(err);
 					}
 					statusCode = resp && resp.statusCode;
+					responseBody = body;
 				});
 			});
 		});
 
-		it('should timeout within the default timeout', () => {
+		after( done => {
+			server.close( () => {
+				server = null;
+				done();
+			});
+		});
+
+		it('should timeout after default timeout time has passed', () => {
+			expect(responseBody.requestTime).to.be.at.least(250);
+		});
+
+		it('should respond with expected error', () => {
 			expect(statusCode).to.equal(503);
 		});
 
@@ -149,7 +160,7 @@ describe.only('timeout.spec.js', () => {
 
 			it('should return the argument values provided to the method', () => {
 				expect(delayArguments.args).to.deep.equal({
-					0: 'ok'
+					0: 'globalTimeout'
 				});
 			});
 
@@ -163,9 +174,77 @@ describe.only('timeout.spec.js', () => {
 				});
 			});
 		});
+	});
+
+	describe('when calling endoint with specific endpoint timeout', () => {
+		var server, statusCode, responseBody;
+
+		before( done => {
+			var options = {
+				timeout: 250,
+				error: {
+					statusCode: 503
+				}
+			};
+
+			var lag = 750;
+			var specificTimeout = 500;
+			server = testServer(options, lag, specificTimeout, url => {
+				var endpoint = `${url}/testSpecificTimeout`;
+				request.get(endpoint, { json: true }, (err, resp, body) => {
+					statusCode = resp && resp.statusCode;
+					responseBody = body;
+					done(err);
+				});
+			});
+		});
+
+		after( done => {
+			server.close( () => {
+				server = null;
+				done();
+			});
+		});
+
+		it('should timeout after specific endpoint timeout time has passed', () => {
+			expect(responseBody.requestTime).to.be.at.least(500);
+		});
+
+		it('should respond with expected error', () => {
+			expect(statusCode).to.equal(503);
+		});
 
 	});
 
+	describe('when setting no default timeout and calling endpoint with specific timeout', () => {
+		var server, responseBody;
 
+		before( done => {
+			var lag = 750;
+			var specificTimeout = 500;
+			server = testServer(null, lag, specificTimeout, url => {
+				var endpoint = `${url}/testSpecificTimeout`;
+				request.get(endpoint, { json: true }, (err, resp, body) => {
+					responseBody = body;
+					done(err);
+				});
+			});
+		});
+
+		after( done => {
+			server.close( () => {
+				server = null;
+				done();
+			});
+		});
+		it('should timeout after specific endpoint timeout time has passed', () => {
+			expect(responseBody.requestTime).to.be.at.least(500);
+		});
+
+		it('should respond with expected error', () => {
+			expect(responseBody.msg).to.equal('Error: Timeout happened');
+		});
+
+	});
 
 });
