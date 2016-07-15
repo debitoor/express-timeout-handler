@@ -209,7 +209,6 @@ describe('timeout.spec.js', () => {
 		it('should respond with expected error', () => {
 			expect(statusCode).to.equal(503);
 		});
-
 	});
 
 	describe('when setting no default timeout and calling endpoint with specific timeout', () => {
