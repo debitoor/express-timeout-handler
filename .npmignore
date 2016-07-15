@@ -1,4 +1,5 @@
 test
 .gitignore
 .eslintrc
+.eslintignore
 .jscsrc
