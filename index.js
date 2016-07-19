@@ -91,6 +91,7 @@ function handler(opts) {
 				return memo;
 			}, {});
 			opts.onDelayedResponse(method, args, requestTime, timeoutError);
+			opts.onDelayedResponse = null;
 		}
 	}
 }
