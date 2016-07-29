@@ -134,7 +134,7 @@ describe('timeout.spec.js', () => {
 					requestTime = Date.now() - start;
 					res.status(503).send('Service unavailable');
 				},
-				onDelayedResponse: (method, args, requestTime) => {
+				onDelayedResponse: (req, method, args, requestTime) => {
 					delayArguments = {
 						method,
 						args,

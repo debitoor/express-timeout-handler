@@ -81,22 +81,22 @@ function handler(opts) {
 			timeoutSocket && timeoutSocket.destroy();
 		});
 
+		function accessAttempt() {
+			if (opts.onDelayedResponse) {
+				var requestTime = Date.now() - start;
+				var method = `res.${arguments[0]}`;
+				delete arguments[0];
+				var args = Object.keys(arguments).reduce((memo, key, index) => {
+					memo[index] = arguments[key];
+					return memo;
+				}, {});
+				opts.onDelayedResponse(req, method, args, requestTime);
+				opts.onDelayedResponse = null; //only call onDelayedResponse once
+			}
+		}
+
 		next();
 	};
-
-	function accessAttempt() {
-		if (opts.onDelayedResponse) {
-			var requestTime = Date.now() - start;
-			var method = `res.${arguments[0]}`;
-			delete arguments[0];
-			var args = Object.keys(arguments).reduce((memo, key, index) => {
-				memo[index] = arguments[key];
-				return memo;
-			}, {});
-			opts.onDelayedResponse(method, args, requestTime);
-			opts.onDelayedResponse = null;
-		}
-	}
 }
 
 function validateTimeout(timeout) {
