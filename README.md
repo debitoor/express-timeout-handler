@@ -24,8 +24,8 @@ var options = {
   timeout: 3000,
 
   // Optional. This function will be called on a timeout and it MUST
-	// terminate the request.
-	// If omitted the module will end the request with a default 503 error.
+  // terminate the request.
+  // If omitted the module will end the request with a default 503 error.
   onTimeout: function(req, res) {
     res.status(503).send('Service unavailable. Please retry.');
   },
