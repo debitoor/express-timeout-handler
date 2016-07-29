@@ -2,11 +2,11 @@
 
 [![npm version](https://badge.fury.io/js/express-timeout-handler.svg)](https://badge.fury.io/js/express-timeout-handler) [![Build Status](https://travis-ci.org/debitoor/express-timeout-handler.svg?branch=master)](https://travis-ci.org/debitoor/express-timeout-handler) [![Dependency Status](https://david-dm.org/debitoor/express-timeout-handler.svg)](https://david-dm.org/debitoor/express-timeout-handler) [![devDependency Status](https://david-dm.org/debitoor/express-timeout-handler/dev-status.svg)](https://david-dm.org/debitoor/express-timeout-handler#info=devDependencies) [![Coverage Status](https://coveralls.io/repos/github/debitoor/express-timeout-handler/badge.svg?branch=master)](https://coveralls.io/github/debitoor/express-timeout-handler?branch=master)
 
-Express timeout middleware that works in combination with any error middleware in express.
+Express timeout middleware that ensures a response is returned to the client on a timeout event.
 
-Add a global timeouts to all your routes in express and add individual timeouts to specific routes. If a timeout happens an error will be passed to the ``next`` callback in express, so that an error handler can act on the timeout. After the error handler sends a response to the caller, this module will set a ``globalTimeout`` property on the response object to true and disable all methods on the response object which might try and send something after the timeout happened.
+Add a global timeout to all your routes in express and add individual timeouts to specific routes. If a timeout happens the ``onTimeout`` function will be called. The ``onTimeout`` function MUST terminate the request with a response. When a timeout happens, this module will set a ``globalTimeout`` property on the response object to true and disable all methods on the response object which might try and send something after the timeout happened.
 
-Note on streams: whenever a stream has started streaming to the response object, the timeout can not be expected to be triggered. Or in other words: if a timeout happens after we start streaming, the stream will not be interrupted.
+Note on streams: whenever a stream has started streaming to the response object, the ``onTimeout`` function will not be triggered. Or in other words: if a timeout happens after we start streaming, the stream will not be interrupted.
 
 	npm install --save express-timeout-handler
 
@@ -23,12 +23,11 @@ var options = {
   // If omitted there is no default timeout on endpoints
   timeout: 3000,
 
-  // Optional. This will be the error passed to the next-function if a timeout
-  // happens. It can be an object or a function that returns the error to be
-  // used. If omitted a default error is used.
-  error: {
-    msg: 'Service unavailable. Please try again.',
-    statusCode: 503
+  // Optional. This function will be called on a timeout and it MUST
+	// terminate the request.
+	// If omitted the module will end the request with a default 503 error.
+  onTimeout: function(req, res) {
+    res.status(503).send('Service unavailable. Please retry.');
   },
 
   // Optional. Define a function to be called if an attempt to send a response
@@ -46,7 +45,7 @@ var options = {
   // response object when a timeout happens and an error has been sent. If
   // omitted, a default list of all methods that tries to send a response
   // will be disable on the response object
-  disable: ['writeHead', 'send', 'json', 'end'];
+  disable: ['write', 'setHeaders', 'send', 'json', 'end'];
 };
 
 app.use(timeout.handler(options));
@@ -64,12 +63,6 @@ app.get('/leave',
     res.send('Goodbye!');
   }
 );
-
-app.use(function(err, req, res, next) {
-  var statusCode = err.statusCode || 500;
-  var msg = err.msg || 'Error happened on server';
-  res.status(statusCode).send(msg);
-});
 
 app.listen(3000, function () {
   console.log('Server listening on port 3000');

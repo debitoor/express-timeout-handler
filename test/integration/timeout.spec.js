@@ -62,6 +62,26 @@ describe('timeout.spec.js', () => {
 			});
 		});
 
+		describe('when onTimeout is not a function', () => {
+			var errMsg;
+
+			before( done => {
+				try {
+					testServer({
+						timeout: 1,
+						onTimeout: '1'
+					}, 0, 0, () => {});
+				} catch (e) {
+					errMsg = e.toString();
+					done();
+				}
+			});
+
+			it('should throw an error', () => {
+				expect(errMsg).to.be.equal('Error: onTimeout option must be a function');
+			});
+		});
+
 		describe('when onDelayedResponse is not a function', () => {
 			var errMsg;
 
@@ -89,7 +109,6 @@ describe('timeout.spec.js', () => {
 				try {
 					testServer({
 						timeout: 1,
-						onDelayedResponse: () => {},
 						disable: '1'
 					}, 0, 0, () => {});
 				} catch (e) {
@@ -105,20 +124,21 @@ describe('timeout.spec.js', () => {
 	});
 
 	describe('when calling endoint without timeout', () => {
-		var server, statusCode, responseBody, delayArguments;
+		var server, statusCode, requestTime, delayArguments;
 
 		before( done => {
+			var start;
 			var options = {
 				timeout: 250,
-				error: {
-					statusCode: 503
+				onTimeout: (req, res) => {
+					requestTime = Date.now() - start;
+					res.status(503).send('Service unavailable');
 				},
-				onDelayedResponse: function(method, args, requestTime, err) {
+				onDelayedResponse: (method, args, requestTime) => {
 					delayArguments = {
 						method,
 						args,
-						requestTime,
-						err
+						requestTime
 					};
 					done();
 				}
@@ -127,12 +147,12 @@ describe('timeout.spec.js', () => {
 			var lag = 750;
 			server = testServer(options, lag, url => {
 				var endpoint = `${url}/test`;
+				start = Date.now();
 				request.get(endpoint, { json: true }, (err, resp, body) => {
 					if (err) {
 						done(err);
 					}
 					statusCode = resp && resp.statusCode;
-					responseBody = body;
 				});
 			});
 		});
@@ -142,7 +162,7 @@ describe('timeout.spec.js', () => {
 		});
 
 		it('should timeout after default timeout time has passed', () => {
-			expect(responseBody.requestTime).to.be.at.least(250);
+			expect(requestTime).to.be.at.least(250);
 		});
 
 		it('should respond with expected error', () => {
@@ -164,31 +184,54 @@ describe('timeout.spec.js', () => {
 			it('should return the true request duration', () => {
 				expect(delayArguments.requestTime).to.be.at.least(750);
 			});
-
-			it('should return err passed to next-function', () => {
-				expect(delayArguments.err).to.deep.equal({
-					statusCode: 503
-				});
-			});
 		});
 	});
 
 	describe('when calling endoint with specific endpoint timeout', () => {
-		var server, statusCode, responseBody;
+		var server, statusCode, requestTime;
 
 		before( done => {
+			var start;
 			var options = {
 				timeout: 250,
-				error: () => {
-					return {
-						statusCode: 503
-					};
+				onTimeout: (req, res) => {
+					requestTime = Date.now() - start;
+					res.status(503).send('Service unavailable');
 				}
 			};
 
 			var lag = 750;
 			var specificTimeout = 500;
 			server = testServer(options, lag, specificTimeout, url => {
+				var endpoint = `${url}/testSpecificTimeout`;
+				start = Date.now();
+				request.get(endpoint, { json: true }, (err, resp, body) => {
+					statusCode = resp && resp.statusCode;
+					done(err);
+				});
+			});
+		});
+
+		after( done => {
+			server.close(done);
+		});
+
+		it('should timeout after specific endpoint timeout time has passed', () => {
+			expect(requestTime).to.be.at.least(500);
+		});
+
+		it('should respond with expected error', () => {
+			expect(statusCode).to.equal(503);
+		});
+	});
+
+	describe('when setting no default timeout and calling endpoint with specific timeout', () => {
+		var server, statusCode, responseBody;
+
+		before( done => {
+			var lag = 750;
+			var specificTimeout = 500;
+			server = testServer(null, lag, specificTimeout, url => {
 				var endpoint = `${url}/testSpecificTimeout`;
 				request.get(endpoint, { json: true }, (err, resp, body) => {
 					statusCode = resp && resp.statusCode;
@@ -202,40 +245,12 @@ describe('timeout.spec.js', () => {
 			server.close(done);
 		});
 
-		it('should timeout after specific endpoint timeout time has passed', () => {
-			expect(responseBody.requestTime).to.be.at.least(500);
-		});
-
-		it('should respond with expected error', () => {
+		it('should respond with default status code', () => {
 			expect(statusCode).to.equal(503);
 		});
-	});
 
-	describe('when setting no default timeout and calling endpoint with specific timeout', () => {
-		var server, responseBody;
-
-		before( done => {
-			var lag = 750;
-			var specificTimeout = 500;
-			server = testServer(null, lag, specificTimeout, url => {
-				var endpoint = `${url}/testSpecificTimeout`;
-				request.get(endpoint, { json: true }, (err, resp, body) => {
-					responseBody = body;
-					done(err);
-				});
-			});
-		});
-
-		after( done => {
-			server.close(done);
-		});
-
-		it('should timeout after specific endpoint timeout time has passed', () => {
-			expect(responseBody.requestTime).to.be.at.least(500);
-		});
-
-		it('should respond with expected error', () => {
-			expect(responseBody.msg).to.equal('Error: Timeout happened');
+		it('should respond with default error response', () => {
+			expect(responseBody).to.equal('Service unavailable');
 		});
 	});
 

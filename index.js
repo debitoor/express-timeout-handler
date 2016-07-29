@@ -1,24 +1,24 @@
 const DEFAULT_DISABLE_LIST = [
-	'writeHead',
 	'setHeaders',
 	'write',
-	'addTrailers',
+	'send',
+	'json',
+	'status',
 	'end',
+	'writeHead',
+	'addTrailers',
 	'writeContinue',
 	'append',
 	'attachment',
 	'download',
 	'format',
-	'json',
 	'jsonp',
 	'location',
 	'redirect',
 	'render',
-	'send',
 	'sendFile',
 	'sendStatus',
 	'set',
-	'status',
 	'type',
 	'vary'
 ];
@@ -43,6 +43,9 @@ function handler(opts) {
 	}
 	opts = opts || {};
 
+	if (opts.onTimeout && typeof opts.onTimeout !== 'function') {
+		throw new Error('onTimeout option must be a function');
+	}
 	if (opts.onDelayedResponse && typeof opts.onDelayedResponse !== 'function') {
 		throw new Error('onDelayedResponse option must be a function');
 	}
@@ -50,36 +53,36 @@ function handler(opts) {
 		throw new Error('disable option must be an array');
 	}
 	var disableList = opts.disable || DEFAULT_DISABLE_LIST;
-	var start, timeoutSocket, timeoutError;
+	var start, timeoutSocket;
 
 	return function(req, res, next) {
 		start = Date.now();
 		timeoutSocket = null;
-		timeoutError = null;
 
 		opts.timeout && req.connection.setTimeout(opts.timeout);
 
 		res.on('timeout', socket => {
 			res.globalTimeout = true;
-			timeoutError = getError(opts.error);
 			timeoutSocket = socket;
-			next(timeoutError);
+
+			if (!res.headersSent) {
+				if (opts.onTimeout) {
+					opts.onTimeout(req, res);
+				} else {
+					res.status(503).send('Service unavailable');
+				}
+				disableList.forEach( method => {
+					res[method] = accessAttempt.bind(null, method);
+				});
+			}
 		});
 
 		res.on('finish', () => {
-			timeoutSocket && disableResponse(res);
+			timeoutSocket && timeoutSocket.destroy();
 		});
 
 		next();
 	};
-
-	function disableResponse(res) {
-		timeoutSocket.destroy();
-
-		disableList.forEach( method => {
-			res[method] = accessAttempt.bind(null, method);
-		});
-	}
 
 	function accessAttempt() {
 		if (opts.onDelayedResponse) {
@@ -90,19 +93,10 @@ function handler(opts) {
 				memo[index] = arguments[key];
 				return memo;
 			}, {});
-			opts.onDelayedResponse(method, args, requestTime, timeoutError);
+			opts.onDelayedResponse(method, args, requestTime);
 			opts.onDelayedResponse = null;
 		}
 	}
-}
-
-function getError(error) {
-	if (typeof error === 'function') {
-		return error();
-	} else if (error) {
-		return error;
-	}
-	return new Error('Timeout happened');
 }
 
 function validateTimeout(timeout) {
