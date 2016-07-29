@@ -35,9 +35,8 @@ var options = {
   // - method: is the method that was called on the response object
   // - args: are the arguments passed to the method
   // - requestTime: is the duration of the request
-  // - err: is the same err that was passed to the next-function when the
   // timeout happened
-  onDelayedResponse: function(req, method, args, requestTime, err) {
+  onDelayedResponse: function(req, method, args, requestTime) {
     console.log(`Attempted to call ${method} after timeout`);
   },
 
