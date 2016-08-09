@@ -53,11 +53,10 @@ function handler(opts) {
 		throw new Error('disable option must be an array');
 	}
 	var disableList = opts.disable || DEFAULT_DISABLE_LIST;
-	var start, timeoutSocket;
 
 	return function(req, res, next) {
-		start = Date.now();
-		timeoutSocket = null;
+		var start = Date.now();
+		var timeoutSocket = null;
 
 		opts.timeout && req.connection.setTimeout(opts.timeout);
 
