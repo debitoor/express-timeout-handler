@@ -4,7 +4,7 @@
   "description": "Express timeout middleware that ensures a response is returned to the client on a timeout event.",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha",
+    "test": "istanbul cover _mocha",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "preversion": "npm test",
     "postversion": "git push && git push --tags"
@@ -27,16 +27,6 @@
     "mocha": "2.5.3",
     "mocha-eslint": "2.1.1",
     "mocha-jscs": "5.0.1",
-    "nyc": "14.1.1",
     "request": "2.88.0"
-  },
-  "nyc": {
-    "extension": [
-      ".ts"
-    ],
-    "reporter": [
-      "text-summary",
-      "lcov"
-    ]
   }
 }
