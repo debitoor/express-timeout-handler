@@ -66,7 +66,7 @@ function handler(opts) {
 
 			if (!res.headersSent) {
 				if (opts.onTimeout) {
-					opts.onTimeout(req, res);
+					opts.onTimeout(req, res, next);
 				} else {
 					res.status(503).send('Service unavailable');
 				}
