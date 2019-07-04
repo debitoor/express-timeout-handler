@@ -1,6 +1,6 @@
 {
   "name": "express-timeout-handler",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Express timeout middleware that ensures a response is returned to the client on a timeout event.",
   "main": "index.js",
   "scripts": {
