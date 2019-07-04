@@ -35,7 +35,8 @@
       ".ts"
     ],
     "reporter": [
-      "text-summary"
+      "text-summary",
+      "lcov"
     ]
   }
 }
