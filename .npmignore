@@ -4,3 +4,4 @@ coverage
 .eslintrc
 .eslintignore
 .jscsrc
+.nyc_output
