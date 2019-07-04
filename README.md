@@ -8,7 +8,13 @@ Add a global timeout to all your routes in express and add individual timeouts t
 
 Note on streams: whenever a stream has started streaming to the response object, the ``onTimeout`` function will not be triggered. Or in other words: if a timeout happens after we start streaming, the stream will not be interrupted.
 
-	npm install --save express-timeout-handler
+```bash
+npm install --save express-timeout-handler
+```
+
+## Note: Moved to @debitoor
+
+As the source code belongs to [debitoor](express-timeout-handler) we have moved the package to **@debitoor** organisation on NPM: [@debitoor/express-timeout-handler](https://www.npmjs.com/package/@debitoor/express-timeout-handler).
 
 ## Usage
 
