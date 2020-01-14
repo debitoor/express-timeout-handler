@@ -28,5 +28,8 @@
     "mocha-eslint": "6.0.0",
     "mocha-jscs": "5.0.1",
     "request": "2.88.0"
+  },
+  "engines": {
+    "node": ">=6.0.0"
   }
 }
