@@ -92,6 +92,7 @@ function handler(opts) {
 				opts.onDelayedResponse(req, method, args, requestTime);
 				opts.onDelayedResponse = null; //only call onDelayedResponse once
 			}
+			return res
 		}
 
 		next();
