@@ -20,7 +20,7 @@
   "homepage": "https://github.com/debitoor/express-timeout-handler",
   "devDependencies": {
     "chai": "3.5.0",
-    "coveralls": "2.11.11",
+    "coveralls": "3.0.9",
     "express": "4.17.1",
     "istanbul": "0.4.5",
     "jscs": "3.0.7",
