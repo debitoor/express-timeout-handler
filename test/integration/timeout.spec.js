@@ -124,13 +124,14 @@ describe('timeout.spec.js', () => {
 	});
 
 	describe('when calling endoint without timeout', () => {
-		var server, statusCode, requestTime, delayArguments;
+		let server, statusCode, requestTime, delayArguments, response;
 
 		before( done => {
 			var start;
 			var options = {
 				timeout: 250,
 				onTimeout: (req, res) => {
+					response = res;
 					requestTime = Date.now() - start;
 					res.status(503).send('Service unavailable');
 				},
@@ -183,6 +184,10 @@ describe('timeout.spec.js', () => {
 
 			it('should return the true request duration', () => {
 				expect(delayArguments.requestTime).to.be.at.least(750);
+			});
+
+			it('we expect that res.json will be a function', () => {
+				expect(response.json).to.be.a('function');
 			});
 		});
 	});

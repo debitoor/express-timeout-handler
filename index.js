@@ -52,11 +52,11 @@ function handler(opts) {
 	if (opts.disable && !Array.isArray(opts.disable)) {
 		throw new Error('disable option must be an array');
 	}
-	var disableList = opts.disable || DEFAULT_DISABLE_LIST;
+	const disableList = opts.disable || DEFAULT_DISABLE_LIST;
 
 	return function(req, res, next) {
-		var start = Date.now();
-		var timeoutSocket = null;
+		const start = Date.now();
+		let timeoutSocket = null;
 
 		opts.timeout && req.connection.setTimeout(opts.timeout);
 
@@ -71,7 +71,7 @@ function handler(opts) {
 					res.status(503).send('Service unavailable');
 				}
 				disableList.forEach( method => {
-					res[method] = accessAttempt.bind(null, method);
+					res[method] = accessAttempt.bind(res, method);
 				});
 			}
 		});
@@ -82,16 +82,17 @@ function handler(opts) {
 
 		function accessAttempt() {
 			if (opts.onDelayedResponse) {
-				var requestTime = Date.now() - start;
-				var method = `res.${arguments[0]}`;
+				const requestTime = Date.now() - start;
+				const method = `res.${arguments[0]}`;
 				delete arguments[0];
-				var args = Object.keys(arguments).reduce((memo, key, index) => {
+				const args = Object.keys(arguments).reduce((memo, key, index) => {
 					memo[index] = arguments[key];
 					return memo;
 				}, {});
 				opts.onDelayedResponse(req, method, args, requestTime);
 				opts.onDelayedResponse = null; //only call onDelayedResponse once
 			}
+			return this;
 		}
 
 		next();
