@@ -124,14 +124,13 @@ describe('timeout.spec.js', () => {
 	});
 
 	describe('when calling endoint without timeout', () => {
-		let server, statusCode, requestTime, delayArguments, response;
+		var server, statusCode, requestTime, delayArguments;
 
 		before( done => {
 			var start;
 			var options = {
 				timeout: 250,
 				onTimeout: (req, res) => {
-					response = res;
 					requestTime = Date.now() - start;
 					res.status(503).send('Service unavailable');
 				},
