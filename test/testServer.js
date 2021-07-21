@@ -1,7 +1,9 @@
 var express = require('express');
 var timeout = require('..');
+let serverError = { err: null };
 
-module.exports = function (timeoutOpts, lag, specificTimeout, callback) {
+const testServer = function (timeoutOpts, lag, specificTimeout, callback) {
+
 	if (typeof specificTimeout === 'function') {
 		callback = specificTimeout;
 		specificTimeout = null;
@@ -18,6 +20,20 @@ module.exports = function (timeoutOpts, lag, specificTimeout, callback) {
 					res.send('globalTimeout');
 				} else {
 					res.send('no globalTimeout set');
+				}
+			}, lag);
+		}
+	);
+
+	app.get('/testChaining',
+		function (req, res, next) {
+			setTimeout(() => {
+				try {
+					res
+						.status(500)
+						.json({ message: 'Chaining should work' });
+				} catch (err) {
+					serverError.err = err;
 				}
 			}, lag);
 		}
@@ -42,4 +58,9 @@ module.exports = function (timeoutOpts, lag, specificTimeout, callback) {
 	});
 
 	return server;
+};
+
+module.exports = {
+	testServer,
+	serverError
 };

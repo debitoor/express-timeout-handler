@@ -1,5 +1,5 @@
 var request = require('request');
-var testServer = require('../testServer');
+const { testServer, serverError } = require('../testServer');
 
 describe('timeout.spec.js', () => {
 
@@ -184,6 +184,53 @@ describe('timeout.spec.js', () => {
 			it('should return the true request duration', () => {
 				expect(delayArguments.requestTime).to.be.at.least(750);
 			});
+
+		});
+	});
+
+	describe('when calling endpoint /testChanging', () => {
+		let server, requestTime, delayArguments;
+
+		before( done => {
+			let start;
+			const options = {
+				timeout: 250,
+				onTimeout: (req, res) => {
+					requestTime = Date.now() - start;
+					res.status(503).send('Service unavailable');
+				},
+				onDelayedResponse: (req, method, args, requestTime) => {
+					delayArguments = {
+						method,
+						args,
+						requestTime
+					};
+					done();
+				}
+			};
+
+			const lag = 750;
+			server = testServer(options, lag, null, url => {
+				const endpoint = `${url}/testChaining`;
+				start = Date.now();
+				request.get(endpoint, { json: true }, (err) => {
+					if (err) {
+						done(err);
+					}
+				});
+			});
+		});
+
+		before('should await 1 sec', async () => {
+			await new Promise(resolve => setTimeout(resolve, 1000));
+		});
+
+		after( done => {
+			server.close(done);
+		});
+
+		it('we expect that res.json will be a function', async () => {
+			expect(serverError).to.include({ err: null});
 		});
 	});
 
