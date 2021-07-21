@@ -189,22 +189,15 @@ describe('timeout.spec.js', () => {
 	});
 
 	describe('when calling endpoint /testChanging', () => {
-		let server, requestTime, delayArguments;
+		let server;
 
 		before( done => {
-			let start;
 			const options = {
 				timeout: 250,
 				onTimeout: (req, res) => {
-					requestTime = Date.now() - start;
 					res.status(503).send('Service unavailable');
 				},
-				onDelayedResponse: (req, method, args, requestTime) => {
-					delayArguments = {
-						method,
-						args,
-						requestTime
-					};
+				onDelayedResponse: () => {
 					done();
 				}
 			};
@@ -212,7 +205,6 @@ describe('timeout.spec.js', () => {
 			const lag = 750;
 			server = testServer(options, lag, null, url => {
 				const endpoint = `${url}/testChaining`;
-				start = Date.now();
 				request.get(endpoint, { json: true }, (err) => {
 					if (err) {
 						done(err);
@@ -220,6 +212,7 @@ describe('timeout.spec.js', () => {
 				});
 			});
 		});
+
 
 		before('should await 1 sec', async () => {
 			await new Promise(resolve => setTimeout(resolve, 1000));
